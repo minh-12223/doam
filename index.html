@@ -26,11 +26,11 @@
         <button onclick="logout()" style="background:#888; margin-top:20px;">Logout</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
+    <script>
         const firebaseConfig = {
   apiKey: "AIzaSyBx6ZUHwpJUSlWUt_Y1DhLtaBWC5DI4upo",
   authDomain: "esp32-doam.firebaseapp.com",
@@ -44,22 +44,22 @@
 window.login = () => {
             const email = document.getElementById("email").value;
             const pass = document.getElementById("password").value;
-            signInWithEmailAndPassword(auth, email, pass)
+            firebase.auth().signInWithEmailAndPassword(email, pass)
                 .catch(err => alert("Lỗi: " + err.message));
         };
-window.logout = () => signOut(auth);
+window.logout = () => firebase.auth().signOut();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth();
-        const moistureRef = ref(db, 'data/moisture');
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+        const moistureRef = db.ref('data/moisture');
 
-        onAuthStateChanged(auth, (user) => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById("login-box").style.display = "none";
                 document.getElementById("dashboard").style.display = "block";
 
-                onValue(moistureRef, (snapshot) => {
+                moistureRef.on('value', (snapshot) => {
                     document.getElementById("val").innerText = snapshot.val() || 0;
                 });
             } else {
